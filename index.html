@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f36c21" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TFM VIU" />
+  <title>TFM VIU · SA6.1 · SA6.2 · SA7</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --viu: #f36c21; --viu-2: #ff8e51; --ink: #16161a; --muted: #666671;
+      --bg: #fff8f3; --panel: rgba(255,255,255,.92); --line: rgba(22,22,26,.1);
+      --shadow: 0 24px 55px rgba(18,18,22,.10); --radius-xl: 30px; --nav-h: 88px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin:0; font-family:"Inter",system-ui,sans-serif; color:var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(243,108,33,.16), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(243,108,33,.08), transparent 20%),
+        linear-gradient(180deg, #fff7f1 0%, #ffffff 22%, #fffdfa 100%);
+      min-height:100vh;
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 50; padding-top: env(safe-area-inset-top);
+      backdrop-filter: blur(18px); background: rgba(255,255,255,.8);
+      border-bottom: 1px solid rgba(22,22,26,.06);
+    }
+    .topbar-inner, .app { width:min(1180px, calc(100% - 24px)); margin:0 auto; }
+    .topbar-inner {
+      min-height: var(--nav-h); display:grid; grid-template-columns:1fr auto;
+      align-items:center; gap:20px; padding:16px 0;
+    }
+    .brand { display:flex; align-items:center; gap:14px; }
+    .brand-logo {
+      width:58px; height:58px; border-radius:20px; display:grid; place-items:center;
+      background:linear-gradient(135deg, var(--viu), var(--viu-2)); color:white;
+      font-size:1rem; font-weight:800; box-shadow:0 14px 30px rgba(243,108,33,.26);
+      letter-spacing:.05em;
+    }
+    .brand-copy h1 { margin:0; font-size:clamp(1.2rem, 2vw, 1.55rem); font-weight:800; letter-spacing:-.03em; }
+    .brand-copy p { margin:4px 0 0; color:var(--muted); font-size:.95rem; }
+    .nav { display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; }
+    .nav a {
+      text-decoration:none; color:var(--ink); font-weight:700; padding:12px 16px;
+      border-radius:999px; background:white; border:1px solid var(--line); transition:.2s ease;
+    }
+    .nav a:hover { background:#fff1e8; border-color:rgba(243,108,33,.28); transform:translateY(-1px); }
+    .app { padding:18px 0 calc(60px + env(safe-area-inset-bottom)); }
+    .overview {
+      margin-bottom:22px; background:var(--panel); border:1px solid rgba(255,255,255,.72);
+      border-radius:var(--radius-xl); box-shadow:var(--shadow); padding:22px;
+      display:grid; grid-template-columns:1.1fr .9fr; gap:20px; align-items:center;
+    }
+    .overview h2 {
+      margin:0 0 10px; font-size:clamp(1.8rem, 3.2vw, 2.8rem); line-height:1;
+      letter-spacing:-.05em; max-width:10ch;
+    }
+    .overview p { margin:0; color:var(--muted); line-height:1.62; max-width:62ch; }
+    .summary-grid { display:grid; gap:12px; }
+    .summary-item {
+      background:white; border:1px solid var(--line); border-radius:20px; padding:14px 16px;
+    }
+    .summary-item-head {
+      display:flex; justify-content:space-between; gap:12px; margin-bottom:8px;
+      font-size:.92rem; font-weight:700;
+    }
+    .track {
+      position:relative; width:100%; height:10px; border-radius:999px; background:#f4e2d7; overflow:hidden;
+    }
+    .track > span {
+      position:absolute; inset:0 auto 0 0; width:0%; background:linear-gradient(90deg, var(--viu), var(--viu-2));
+      border-radius:inherit; transition:width .3s ease;
+    }
+    section.section {
+      scroll-margin-top:calc(var(--nav-h) + 32px); margin-top:22px; background:rgba(255,255,255,.9);
+      border:1px solid rgba(255,255,255,.72); border-radius:32px; box-shadow:var(--shadow); padding:28px;
+    }
+    .section-head {
+      display:flex; align-items:end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:22px;
+    }
+    .section-tag {
+      color:var(--viu); font-size:.92rem; font-weight:800; text-transform:uppercase;
+      letter-spacing:.07em; margin-bottom:10px; display:inline-block;
+    }
+    .section-head h2 { margin:0; font-size:clamp(1.6rem, 3vw, 2.3rem); letter-spacing:-.04em; }
+    .section-head p { margin:10px 0 0; color:var(--muted); line-height:1.62; max-width:64ch; }
+    .section-chip {
+      background:#fff1e8; border:1px solid rgba(243,108,33,.16); color:var(--ink);
+      font-weight:700; border-radius:20px; padding:14px 16px; min-width:220px;
+    }
+    .timeline {
+      position:relative; display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:18px;
+    }
+    .timeline::before {
+      content:""; position:absolute; left:18px; right:18px; top:28px; height:4px;
+      border-radius:999px; background:linear-gradient(90deg, rgba(243,108,33,.18), rgba(243,108,33,.06)); z-index:0;
+    }
+    .step-card {
+      position:relative; z-index:1; display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start;
+      background:white; border:1px solid var(--line); border-radius:24px; padding:18px;
+      box-shadow:0 16px 32px rgba(18,18,22,.06); transition:.2s ease; opacity:.55;
+    }
+    .step-card.is-active {
+      opacity:1; border-color:rgba(243,108,33,.24); box-shadow:0 20px 38px rgba(243,108,33,.10);
+    }
+    .step-card.is-done {
+      opacity:1; background:linear-gradient(180deg, #ffffff, #fff7f1); border-color:rgba(243,108,33,.18);
+    }
+    .step-card:hover { transform:translateY(-2px); }
+    .step-toggle { position:relative; display:inline-grid; place-items:center; margin-top:2px; }
+    .step-check {
+      position:absolute; inset:0; opacity:0; cursor:pointer; width:32px; height:32px; margin:0;
+    }
+    .check-ui {
+      width:32px; height:32px; border-radius:999px; border:2px solid #d7b19d; background:white;
+      display:inline-grid; place-items:center; transition:.2s ease;
+    }
+    .check-ui::after {
+      content:""; width:14px; height:14px; border-radius:999px; background:transparent; transition:.2s ease;
+    }
+    .step-card.is-active .check-ui { border-color:var(--viu); box-shadow:0 0 0 6px rgba(243,108,33,.08); }
+    .step-card.is-done .check-ui { border-color:var(--viu); background:linear-gradient(135deg, var(--viu), var(--viu-2)); }
+    .step-card.is-done .check-ui::after { background:white; width:10px; height:10px; }
+    .step-meta { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px; }
+    .step-pill, .step-state {
+      font-size:.82rem; font-weight:800; border-radius:999px; padding:6px 10px;
+    }
+    .step-pill { background:#fff1e8; color:var(--viu); }
+    .step-state { background:#f5f5f7; color:#70707a; }
+    .step-card.is-active .step-state { background:rgba(243,108,33,.12); color:var(--viu); }
+    .step-card.is-done .step-state { background:rgba(41,154,90,.12); color:#2d9155; }
+    .step-content h3 {
+      margin:0 0 8px; font-size:1rem; line-height:1.3; letter-spacing:-.02em;
+    }
+    .step-content p { margin:0; color:var(--muted); font-size:.92rem; }
+    .footer { padding:20px 4px 10px; text-align:center; color:var(--muted); font-size:.9rem; }
+    @media (max-width:980px) {
+      .topbar-inner, .overview { grid-template-columns:1fr; }
+      .nav { justify-content:flex-start; }
+      .overview h2 { max-width:none; }
+    }
+    @media (max-width:640px) {
+      .topbar-inner, .app { width:min(100% - 18px, 1180px); }
+      .topbar-inner { min-height:auto; }
+      .overview, section.section { padding:20px 16px; border-radius:26px; }
+      .brand-logo { width:52px; height:52px; border-radius:18px; }
+      .timeline::before { display:none; }
+      .nav a { padding:10px 13px; font-size:.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">VIU</div>
+        <div class="brand-copy">
+          <h1>TFM · Situaciones de aprendizaje</h1>
+          <p>Seguimiento visual por fases</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Secciones">
+        <a href="#sa61">SA6.1</a>
+        <a href="#sa62">SA6.2</a>
+        <a href="#sa7">SA7</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app">
+    <section class="overview" aria-label="Resumen">
+      <div>
+        <h2>Avance del proceso creativo</h2>
+        <p>
+          Cada situación de aprendizaje se resume en fases más claras y visuales.
+          Marca una fase y se desbloquea la siguiente para seguir el recorrido paso a paso.
+        </p>
+      </div>
+      <div class="summary-grid">
+        <article class="summary-item">
+          <div class="summary-item-head"><span>SA6.1 · Prohibido decir NO</span><span id="summary-sa61">0%</span></div>
+          <div class="track"><span id="bar-sa61"></span></div>
+        </article>
+        <article class="summary-item">
+          <div class="summary-item-head"><span>SA6.2 · Eureka</span><span id="summary-sa62">0%</span></div>
+          <div class="track"><span id="bar-sa62"></span></div>
+        </article>
+        <article class="summary-item">
+          <div class="summary-item-head"><span>SA7 · ¿Qué problema te solucionamos?</span><span id="summary-sa7">0%</span></div>
+          <div class="track"><span id="bar-sa7"></span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="sa61">
+      <div class="section-head">
+        <div>
+          <span class="section-tag">SA6.1</span>
+          <h2>Prohibido decir NO</h2>
+          <p>Secuencia breve para expresar el paso desde la observación inicial hasta la iteración de propuestas.</p>
+        </div>
+        <div class="section-chip">4 fases · exploración creativa</div>
+      </div>
+      <div class="timeline">
+        
+        <article class="step-card" data-section="sa61" data-index="0">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa61" data-index="0">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 1</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>OBSERVAR</h3>
+            <p>Fase 1 de 4</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa61" data-index="1">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa61" data-index="1">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 2</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>GENERAR IDEAS</h3>
+            <p>Fase 2 de 4</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa61" data-index="2">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa61" data-index="2">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 3</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>PROBAR SIN MIEDO</h3>
+            <p>Fase 3 de 4</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa61" data-index="3">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa61" data-index="3">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 4</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>DESECHAR / ITERAR</h3>
+            <p>Fase 4 de 4</p>
+          </div>
+        </article>
+        
+      </div>
+    </section>
+
+    <section class="section" id="sa62">
+      <div class="section-head">
+        <div>
+          <span class="section-tag">SA6.2</span>
+          <h2>Eureka</h2>
+          <p>Fases centradas en elegir, mejorar y concretar la solución más adecuada.</p>
+        </div>
+        <div class="section-chip">4 fases · definición de solución</div>
+      </div>
+      <div class="timeline">
+        
+        <article class="step-card" data-section="sa62" data-index="0">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa62" data-index="0">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 1</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>SELECCIONAR</h3>
+            <p>Fase 1 de 4</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa62" data-index="1">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa62" data-index="1">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 2</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>MEJORAR</h3>
+            <p>Fase 2 de 4</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa62" data-index="2">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa62" data-index="2">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 3</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>DEFINIR FUNCIONAMIENTO</h3>
+            <p>Fase 3 de 4</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa62" data-index="3">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa62" data-index="3">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 4</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>DECIDIR IDEA FINAL</h3>
+            <p>Fase 4 de 4</p>
+          </div>
+        </article>
+        
+      </div>
+    </section>
+
+    <section class="section" id="sa7">
+      <div class="section-head">
+        <div>
+          <span class="section-tag">SA7</span>
+          <h2>¿Qué problema te solucionamos?</h2>
+          <p>Proceso de materialización de la idea, desde su forma y estructura hasta la mejora final del producto.</p>
+        </div>
+        <div class="section-chip">5 fases · construcción y mejora</div>
+      </div>
+      <div class="timeline">
+        
+        <article class="step-card" data-section="sa7" data-index="0">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa7" data-index="0">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 1</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>DAR FORMA</h3>
+            <p>Fase 1 de 5</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa7" data-index="1">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa7" data-index="1">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 2</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>DEFINIR ESTRUCTURA</h3>
+            <p>Fase 2 de 5</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa7" data-index="2">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa7" data-index="2">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 3</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>DISEÑO GRÁFICO</h3>
+            <p>Fase 3 de 5</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa7" data-index="3">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa7" data-index="3">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 4</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>CONSTRUIR</h3>
+            <p>Fase 4 de 5</p>
+          </div>
+        </article>
+        
+
+        <article class="step-card" data-section="sa7" data-index="4">
+          <label class="step-toggle">
+            <input type="checkbox" class="step-check" data-section="sa7" data-index="4">
+            <span class="check-ui" aria-hidden="true"></span>
+          </label>
+          <div class="step-content">
+            <div class="step-meta">
+              <span class="step-pill">Paso 5</span>
+              <span class="step-state">Pendiente</span>
+            </div>
+            <h3>MEJORAR</h3>
+            <p>Fase 5 de 5</p>
+          </div>
+        </article>
+        
+      </div>
+    </section>
+
+    <div class="footer">Guardado automático en el navegador. Puedes instalarla como app desde Safari.</div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "tfm-viu-fases-v3";
+    const structure = {"sa61": 4, "sa62": 4, "sa7": 5};
+    const state = loadState();
+
+    function createDefaultState() {
+      return Object.fromEntries(
+        Object.entries(structure).map(([k, len]) => [k, Array.from({ length: len }, () => false)])
+      );
+    }
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        const fallback = createDefaultState();
+        for (const key of Object.keys(structure)) {
+          if (!Array.isArray(saved[key]) || saved[key].length !== structure[key]) {
+            saved[key] = fallback[key];
+          }
+        }
+        return saved;
+      } catch {
+        return createDefaultState();
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function applySection(sectionId) {
+      const values = state[sectionId];
+      const cards = Array.from(document.querySelectorAll(`.step-card[data-section="${sectionId}"]`));
+      cards.forEach((card, i) => {
+        const input = card.querySelector(".step-check");
+        const stateBadge = card.querySelector(".step-state");
+        const previousDone = i === 0 ? true : values[i - 1];
+        const done = values[i] === true;
+        const active = !done && previousDone;
+
+        input.checked = done;
+        input.disabled = !active && !done;
+
+        card.classList.toggle("is-done", done);
+        card.classList.toggle("is-active", active);
+
+        stateBadge.textContent = done ? "Hecho" : active ? "En curso" : "Bloqueado";
+      });
+
+      const doneCount = values.filter(Boolean).length;
+      const pct = Math.round((doneCount / values.length) * 100);
+      const summary = document.getElementById(`summary-${sectionId}`);
+      const bar = document.getElementById(`bar-${sectionId}`);
+      if (summary) summary.textContent = `${pct}%`;
+      if (bar) bar.style.width = `${pct}%`;
+    }
+
+    function render() {
+      for (const key of Object.keys(structure)) applySection(key);
+    }
+
+    document.querySelectorAll(".step-check").forEach((input) => {
+      input.addEventListener("change", (e) => {
+        const sectionId = e.target.dataset.section;
+        const index = Number(e.target.dataset.index);
+        const values = state[sectionId];
+
+        if (e.target.checked) {
+          values[index] = true;
+        } else {
+          for (let i = index; i < values.length; i++) values[i] = false;
+        }
+
+        saveState();
+        render();
+      });
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => null));
+    }
+
+    render();
+  </script>
+</body>
+</html>

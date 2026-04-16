@@ -1,0 +1,9 @@
+{
+  "name": "TFM VIU Fases",
+  "short_name": "TFM VIU",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff8f3",
+  "theme_color": "#f36c21",
+  "icons": []
+}
